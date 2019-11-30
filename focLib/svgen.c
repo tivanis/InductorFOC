@@ -41,7 +41,7 @@
 // $
 //#############################################################################
 
-#include "svgen.h"
+#include <foclib/inc/svgen.h>
 
 #ifdef __TMS320C28XX_CLA__
 #pragma CODE_SECTION(SVGEN_init,"Cla1Prog2");

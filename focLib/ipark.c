@@ -44,7 +44,7 @@
 #pragma CODE_SECTION(IPARK_init,"Cla1Prog2");
 #endif // __TMS320C28XX_CLA__
 
-#include "ipark.h"
+#include <foclib/inc/ipark.h>
 
 //*****************************************************************************
 //

@@ -43,7 +43,7 @@
 // **************************************************************************
 // the includes
 
-#include "svgen_current.h"
+#include <foclib/inc/svgen_current.h>
 
 #ifdef __TMS320C28XX_CLA__
 #pragma CODE_SECTION(SVGENCURRENT_init,"Cla1Prog2");

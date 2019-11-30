@@ -6,8 +6,6 @@
 //  $E-mail:        tomislav.ivanis@gmail.com
 //                  tomislav.ivanis@fer.hr
 //
-//   Redistributions of source code must retain the above copyright notice.
-//
 //#############################################################################
 
 #include "TMC6200.h"

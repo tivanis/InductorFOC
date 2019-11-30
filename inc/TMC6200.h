@@ -6,8 +6,6 @@
 //  $E-mail:        tomislav.ivanis@gmail.com
 //                  tomislav.ivanis@fer.hr
 //
-//   Redistributions of source code must retain the above copyright notice.
-//
 //#############################################################################
 
 #ifndef INC_TMC6200_H_
@@ -44,8 +42,8 @@
 
 //! \brief Default GPIO pins for enable and fault lines
 //!
-#define TMC6200_DEFAULT_ENABLE_PIN      12U
-#define TMC6200_DEFAULT_FAULT_PIN       27U
+#define TMC6200_DEFAULT_ENABLE_PIN      (12U)
+#define TMC6200_DEFAULT_FAULT_PIN       (27U)
 
 //! \brief Default GPIO pins for SPI communication
 //!

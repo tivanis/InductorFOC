@@ -40,7 +40,7 @@
 // $
 //#############################################################################
 
-#include "park.h"
+#include <foclib/inc/park.h>
 
 #ifdef __TMS320C28XX_CLA__
 #pragma CODE_SECTION(PARK_init,"Cla1Prog2");

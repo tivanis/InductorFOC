@@ -1,9 +1,9 @@
-
 //#############################################################################
 //
-// FILE:   clarke.c
+// FILE:   pi.c
 //
-// TITLE:  C28x Clarke transform library
+// TITLE:  C28x InstaSPIN Proportional-Integral (PI) controller library
+//         (floating point)
 //
 //#############################################################################
 // $TI Release: MotorControl SDK v1.00.00.00 $
@@ -40,43 +40,41 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // $
 //#############################################################################
+
+#include "pi.h"
+
 #ifdef __TMS320C28XX_CLA__
-#pragma CODE_SECTION(CLARKE_init,"Cla1Prog2");
+#pragma CODE_SECTION(PI_init,"Cla1Prog2");
 #endif
 
-#include <foclib/inc/clarke.h>
-
-// ****************************************************************************
+//*****************************************************************************
 //
-// CLARKE_init
+// PI_init
 //
-// ****************************************************************************
-CLARKE_Handle
-CLARKE_init(void *pMemory, const size_t numBytes)
+//*****************************************************************************
+PI_Handle
+PI_init(void *pMemory, const size_t numBytes)
 {
-    CLARKE_Handle handle;
+    PI_Handle handle;
 
-    if((int16_t)numBytes < (int16_t)sizeof(CLARKE_Obj))
+    if((int16_t)numBytes < (int16_t)sizeof(PI_Obj))
     {
-        //
-        /*LDRA_INSPECTED 95 S MR12 11.3 "Below typecasting has no issues"
-        */
-        return((CLARKE_Handle)NULL);
+        /*LDRA_INSPECTED 95 S MR12 11.3 "Below typecasting to NULL has no
+        issues"*/
+        return((PI_Handle)NULL);
     }
 
     //
-    // assign the handle
-    /* LDRA_INSPECTED 94 S MR12 11.3 "Below typecasting has no issues"
-    // LDRA_INSPECTED 95 S MR12 11.3 "Below typecasting has no issues"
-    */
-    handle = (CLARKE_Handle)pMemory;
-
+    // Assign the handle
     //
-    /* LDRA_INSPECTED 71 S MR12 11.3 "Always, address of a static object is
-    // passed, so ok for wider scope"
-    */
+    /*LDRA_INSPECTED 94 S MR12 11.3 "Below typecasting to void * has no
+    issues"*/
+    /*LDRA_INSPECTED 95 S MR12 11.3 "Below typecasting to void * no issues"*/
+    handle = (PI_Handle)pMemory;
+
+    /*LDRA_INSPECTED 71 S MR12 11.3 "Always, address of a static object is
+    passed, so ok for wider scope"*/
     return(handle);
-} // end of CLARKE_init() function
-//
+} // end of PI_init() function
+
 // end of file
-//
