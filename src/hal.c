@@ -514,6 +514,13 @@ void HAL_adcCalib(HAL_adcValues_t *handle)
     ADC_setupSOC(ADCC_BASE, ADC_SOC_NUMBER5, ADC_TRIGGER_SW_ONLY,
                  ADC_CH_ADCIN1, ADC_SAMPLE_WINDOW);
 
+    //! Define ADC interrupt 2 (ADCINT2)
+    // NOTE: This interrupt will never execute in main (i.e. it will never...
+    //...trigger ). It is intended to happen once.
+    ADC_setInterruptSource(ADCC_BASE, ADC_INT_NUMBER2, ADC_SOC_NUMBER5);
+    ADC_enableInterrupt(ADCC_BASE, ADC_INT_NUMBER2);
+    ADC_clearInterruptStatus(ADCC_BASE, ADC_INT_NUMBER2);
+
     //Force start all conversions
     ADC_forceSOC(ADCC_BASE, ADC_SOC_NUMBER3);
     ADC_forceSOC(ADCA_BASE, ADC_SOC_NUMBER3);
@@ -522,17 +529,13 @@ void HAL_adcCalib(HAL_adcValues_t *handle)
     ADC_forceSOC(ADCC_BASE, ADC_SOC_NUMBER4);
     ADC_forceSOC(ADCC_BASE, ADC_SOC_NUMBER5);
 
-    //Wait for all of the conversions to finish
-    while(ADC_isBusy(ADCA_BASE) ||
-          ADC_isBusy(ADCB_BASE) ||
-          ADC_isBusy(ADCC_BASE))
+    // Wait for ADCB to complete, then acknowledge flag
+    while(ADC_getInterruptStatus(ADCC_BASE, ADC_INT_NUMBER2) == false)
     {
-        NOP;
     }
+    ADC_clearInterruptStatus(ADCC_BASE, ADC_INT_NUMBER2);
 
-    //Wait 1000 cycles:
-    SysCtl_delay(1000U);
-
+    /*
     //Read all of the offsets
     //Read converted phase A current offset (Phase C on PCB)
     handle->IA_offset = (int16_t)
@@ -541,6 +544,12 @@ void HAL_adcCalib(HAL_adcValues_t *handle)
     //Read converted phase B current offset (Phase B on PCB)
     handle->IB_offset = (int16_t)
     (ADC_readResult(ADCA_BASE, ADC_SOC_NUMBER3)-HAL_ADC_ISENSE_ZERO);
+    */
+
+    //TEMPORARY CODE START:
+    handle->IA_offset = (int16_t) 87;
+    handle->IB_offset = (int16_t) 271;
+    //TEMPORARY CODE END
 
     //Rest of the sampled values are ignored (set to zero)
     //Read converted phase A voltage offset (Phase C on PCB)
@@ -551,7 +560,7 @@ void HAL_adcCalib(HAL_adcValues_t *handle)
     handle->UC_offset = (int16_t) 0;
 
     //Read converted phase A voltage offset (Phase C on PCB)
-    handle->UDC_offset= (int16_t) 0;
+    handle->UDC_offset= (int16_t) 6;
 
     //Set the calibration flag
     handle->calibFlag = true;
@@ -597,10 +606,14 @@ void HAL_buildCurrentVectors(HAL_adcValuesHandle adcHandle,
                              MATH_Vec2* outVectHandle)
 {
     //Convert uint16_t with offset to phase current in amps (float32_t)
-    outVectHandle->value[0] = (float32_t)
-            (adcHandle->IA_value - HAL_ADC_ISENSE_ZERO)*HAL_ADC_AMPS_PER_BIT;
-    outVectHandle->value[1] = (float32_t)
-            (adcHandle->IA_value - HAL_ADC_ISENSE_ZERO)*HAL_ADC_AMPS_PER_BIT;
+    //Store values in temporary variable to avoid overflows
+    int32_t temp;
+
+    temp = ((int32_t) adcHandle->IA_value - HAL_ADC_ISENSE_ZERO);
+    outVectHandle->value[0] = (float32_t) temp * HAL_ADC_AMPS_PER_BIT;
+
+    temp = ((int32_t) adcHandle->IB_value - HAL_ADC_ISENSE_ZERO);
+    outVectHandle->value[1] = (float32_t) temp * HAL_ADC_AMPS_PER_BIT;
 }
 
 void HAL_buildVDCValue(HAL_adcValuesHandle adcHandle, float32_t* VDC_V)
@@ -631,26 +644,33 @@ void HAL_calcMaxVdqVoltage(MATH_Vec2* vectHandle, float32_t UDC_V)
     vectHandle->value[1] = UDC_V*PARAMS_VMAX_PU;
 }
 
-void HAL_pwmUpdateRegisters(HAL_pwmData_t *pPWMData)
+void HAL_pwmUpdateRegisters(HAL_pwmData_t *pPWMData, MATH_Vec3 *pVabc_out_pu)
 {
     const uint32_t pwmHandle[3] = {EPWM1_BASE, EPWM2_BASE, EPWM4_BASE};
     uint16_t pwmCnt;
 
     for(pwmCnt=0;pwmCnt<3;pwmCnt++)
     {
-        // compute the value
+        // Get the period value
         float32_t period =
                 (float32_t)(EPWM_getTimeBasePeriod(pwmHandle[pwmCnt]));
 
-        float32_t V_pu = -pPWMData->Vabc_pu.value[pwmCnt];
+        // Take the negative value
+        float32_t V_pu = -pVabc_out_pu->value[pwmCnt];
+
+        //Saturate
         float32_t V_sat_pu = MATH_sat(V_pu, 0.5, -0.5);
+
+        //Add +0.5 to get values ranging from 0 to 1
         float32_t V_sat_dc_pu = V_sat_pu + 0.5;
+
+        //Calculate value that needs to be written to register
         int16_t pwmValue  = (int16_t)(V_sat_dc_pu * period);
 
         // Save current CMP value for OVM
         pPWMData->cmpValue[pwmCnt] = pwmValue;
 
-        // write the PWM data value
+        // Write the PWM data value
         EPWM_setCounterCompareValue(pwmHandle[pwmCnt],
                                     EPWM_COUNTER_COMPARE_A,
                                     pwmValue);

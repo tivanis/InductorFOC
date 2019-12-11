@@ -16,7 +16,7 @@
 #define RAMP_MIN_FREQ            (0.5F)
 #define RAMP_MAX_FREQ            (1000.0F)
 
-#define RAMP_TIMER_DEFAULT_FREQ  (1.0F)
+#define RAMP_TIMER_DEFAULT_FREQ  (50.0F)
 #define RAMP_TIMER_DEFAULT_ANGLE (0.0F)
 
 typedef struct _RAMP_Obj_t

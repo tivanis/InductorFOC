@@ -140,6 +140,10 @@ int main(void)
     svgencurrentHandle = SVGENCURRENT_init(&svgencurrent, sizeof(svgencurrent));
     */
 
+    //SETUP: default reference values for Id and then Iq
+    Idq_ref_A.value[0] = 0;
+    Idq_ref_A.value[1] = 0;
+
     //SETUP: PI controller for d-axis current
     piHandle_Id     = PI_init(&pi_Id, sizeof(pi_Id));
     HAL_setupPI(&pi_Id,
@@ -158,6 +162,9 @@ int main(void)
     //        ...ramp structure
     rampHandle = RAMP_init(&ramp);
 
+    //SETUP: assign PWM data handle to PWM data structure
+    pwmDataHandle = &pwmData;
+
     // SETUP: TMC6200 driver integrated circuit
     TMC6200_initSPI(&TMC6200_Obj);
     TMC6200_deviceEnable();
@@ -167,6 +174,7 @@ int main(void)
     TMC6200_setInterfaceMode(&TMC6200_Obj, TMC6200_GCONF_IF_MODE_INDIVIDUAL);
     TMC6200_setAmplificationMode(&TMC6200_Obj, TMC6200_GCONF_CURR_AMP_10);
     TMC6200_setDriveStrength(&TMC6200_Obj, TMC6200_DRV_WEAK_TC);
+    TMC6200_readRegisters(&TMC6200_Obj);
 
     // Measure the offsets after proper amplification has been set
     HAL_adcCalib(&adcValues);
@@ -331,7 +339,7 @@ __interrupt void mainISR(void)
 
     // Execute ISR body
     //Trip EPWM
-    HAL_tripEPWM();
+    //HAL_tripEPWM();
 
     // Blink LED
     counterLED++;
@@ -399,7 +407,7 @@ __interrupt void mainISR(void)
     SVGEN_run(svgenHandle, &Valbet_out_V, &Vabc_out_pu);
 
     //Scale and modulate (update registers) space vectors
-    HAL_pwmUpdateRegisters(pwmDataHandle);
+    HAL_pwmUpdateRegisters(pwmDataHandle, &Vabc_out_pu);
 
     //Disable Interrupt
     DINT;

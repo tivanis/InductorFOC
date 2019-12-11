@@ -144,7 +144,8 @@ extern void HAL_calcMaxVdqVoltage(MATH_Vec2* vectHandle, float32_t UDC_V);
 
 extern void HAL_buildVDCValue(HAL_adcValues_t* handle, float32_t* VDC_V);
 
-extern void HAL_pwmUpdateRegisters(HAL_pwmData_t *pPWMData);
+extern void HAL_pwmUpdateRegisters(HAL_pwmData_t* pPWMData,
+                                   MATH_Vec3* pVabc_out_pu);
 
 static inline void HAL_setupPI(PI_Handle handle,
                                float32_t Kp,

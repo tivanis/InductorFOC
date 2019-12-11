@@ -33,10 +33,10 @@
 #define PARAMS_CLARKE_BETA_SF           (MATH_ONE_OVER_SQRT_THREE)
 
 // PI controller parameters
-#define PARAMS_PI_KP_ID                 (PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LD_H)
-#define PARAMS_PI_KI_ID                 (PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LD_H)
-#define PARAMS_PI_KP_IQ                 (PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LQ_H)
-#define PARAMS_PI_KI_IQ                 (PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LQ_H)
+#define PARAMS_PI_KP_ID                 (0.05F) //(PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LD_H)
+#define PARAMS_PI_KI_ID                 (0.0005F) //(PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LD_H)
+#define PARAMS_PI_KP_IQ                 (0.05F) //(PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LQ_H)
+#define PARAMS_PI_KI_IQ                 (0.0005F) //(PARAMS_MOTOR_RS_OHM/PARAMS_MOTOR_LQ_H)
 #define PARAMS_PI_VMAX_V                (PARAMS_MOTOR_VPHASE_V)
 #define PARAMS_VMAX_PU                  (MATH_ONE_OVER_SQRT_THREE)
 #define PARAMS_PI_IQ_FF_VALUE           (0.0F)
